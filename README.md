@@ -2,7 +2,7 @@
 
 ## Dependencies
 
-`node.js` (http://nodejs.org/download/)
+`node.js` (http://nodejs.org/download/)  
 `mongodb` (http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/)  
 
 ## Getting Started
