@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+
+		<title>Shazam Part 2</title>
+
+		<link href="stylesheets/index.css" rel="stylesheet" type="text/css">
+
+		<script src="scripts/songSearch.js"></script>
+		<script src="scripts/annyang.min.js"></script>
+
+	</head>
+
+	<body>
+		<h1>Song Search</h1>
+
+		<p>Say some shit such as: "hello"</p>
+
+		<script>
+		if (annyang) {
+			console.log("annyang initialized");
+			// Let's define a command.
+			var commands = {
+				'hello': showTerm
+			};
+
+			var showTerm = function() {
+				console.log("hello");
+			}
+
+			// Add our commands to annyang
+			annyang.addCommands(commands);
+
+			// Start listening.
+			annyang.start();
+		}
+		</script>
+	</body>
+</html>

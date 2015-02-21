@@ -1,0 +1,13 @@
+{
+	"name": "TreeHacks2015",
+	"version": "1.0.0",
+	"description": "Twitter heatmap of user sentiment for a certain hashtag.",
+	"dependencies": {
+		"express": "^4.11.2",
+		"mongoose" : "~3.8.0",
+		"body-parser": "~1.0.0",
+		"morgan": "~1.0.0",
+		"twitter": "1.2.1",
+		"jade": "~1.3.0"
+	}
+}

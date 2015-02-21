@@ -1,0 +1,8 @@
+extends layout
+
+block content
+	h1= title
+	form(action='/sentiment', method='post')
+			.form-group
+				input.form-control(type='text', name='keyword', placeholder='Keyword?')
+			button(type='submit') Search!

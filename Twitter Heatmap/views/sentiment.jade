@@ -1,0 +1,8 @@
+extends layout
+
+block content
+	h1= title
+	.container#tweets
+		- for (var i = 0; i < tweets.count; i++) {
+			p #{tweets[i]}
+		- }
