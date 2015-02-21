@@ -9,28 +9,30 @@
 
 		<script src="scripts/songSearch.js"></script>
 		<script src="scripts/annyang.min.js"></script>
+		<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
 
 	</head>
 
 	<body>
 		<h1>Song Search</h1>
 
-		<p>Say some shit such as: "hello"</p>
+		<p>Say some shit such as: "play lady gaga"</p>
 
 		<script>
 		if (annyang) {
 			console.log("annyang initialized");
 			// Let's define a command.
 			var commands = {
-				"hello": function() {console.log("hello")}
+				'play *term': showTerm
 			};
 
-			var showTerm = function() {
-				console.log("hello");
+			function showTerm(term) {
+				console.log("attempting to play " + term);
 			}
 
 			// Add our commands to annyang
 			annyang.addCommands(commands);
+			annyang.debug();
 
 			// Start listening.
 			annyang.start();
