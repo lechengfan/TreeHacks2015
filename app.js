@@ -19,6 +19,7 @@ mongoose.connect(configDB.url); // connect to our database
 // VIEW ENGINE =========================
 // =====================================
 app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
 
 // =====================================
 // CONFIGURATION =======================
