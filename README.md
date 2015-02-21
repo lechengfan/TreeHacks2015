@@ -1,4 +1,10 @@
 # Twitter Heatmap
+
+## Dependencies
+
+`node.js` (http://nodejs.org/download/)  
+`mongodb` (http://docs.mongodb.org/manual/tutorial/install-mongodb-on-os-x/)  
+
 ## Getting Started
 
 `$ git clone https://github.com/lechengfan/TreeHacks2015.git`  
