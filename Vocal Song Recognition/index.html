@@ -14,20 +14,110 @@
 	</head>
 
 	<body>
-		<h1>Song Search</h1>
+		<div class="site-wrapper">
 
-		<p>Say some shit such as: "play lady gaga"</p>
+	      <div class="site-wrapper-inner">
+
+	        <div class="cover-container">
+	          <div class="inner cover">
+	            <h1 class="cover-heading">Welcome to Play It!</h1>
+	            <p class="lead">Play It takes either song names or lyrics and plays the song for you. Say "search Spotify for <song> by <artist>" to play a song. Say "stop playing" to pause the audio. Say "Find..." and then a set of lyrics to find the song with those lyrics and play it.
+	            </p>
+	          </div>
+	          <div id="status_container"></div>
+
+	          <div class="mastfoot">
+	            <div class="inner">
+	              <p>Tree Hacks 2015, (c) Tommy Fan, Debnil Sur, Gary Thung, Chenyao Yu. Powered by <a href="http://getbootstrap.com">Bootstrap</a>.</p>
+	            </div>
+	          </div>
+
+	        </div>
+
+	      </div>
+
+	    </div>
+
+
+		
 
 		<script>
 		if (annyang) {
 			console.log("annyang initialized");
-			// Let's define a command.
+
+			var statusContainer = document.getElementById("status_container");
+
 			var commands = {
-				'play *term': showTerm
+				'search spotify for *song (by *artist)': spotify,
+				'search soundcloud for *song (by *artist)': soundcloud,
+				'stop playing': pauseSong,
+				'resume song': resumeSong
 			};
 
-			function showTerm(term) {
-				console.log("attempting to play " + term);
+			var audio = document.createElement('audio');
+
+			function spotify(song, artist) {
+				var req = new XMLHttpRequest();
+				if (!artist) {
+					statusContainer.innerHTML = "<p id=\"status\">Searching for song " + song + " in Spotify</p>";
+					req.open('GET', 'https://api.spotify.com/v1/search?type=track&q=' + encodeURIComponent(song), true);
+				} else {
+					statusContainer.innerHTML = "<p id=\"status\">Searching for song " + song + " by " + artist + " in Spotify</p>";
+					req.open('GET', 'https://api.spotify.com/v1/search?type=track&q=' + encodeURIComponent(song + " " + artist), true);
+				}
+				req.onreadystatechange = function() {
+					if (req.readyState == 4 && req.status == 200) {
+						var data = JSON.parse(req.responseText);
+						var firstResult = data.tracks.items[0];
+						if (firstResult) {
+							audio.setAttribute('src', firstResult.preview_url);
+							statusContainer.innerHTML = "<p id=\"status\">Playing " + firstResult.name + " by " + firstResult.artists[0].name + " from Spotify</p>";
+							audio.play();
+					  	} else {
+					  		statusContainer.innerHTML = "<p> id=\"status\"Status: " + song + " not found in Spotify</p>";
+					  	}
+				  	}
+				};
+				req.send(null);
+			}
+
+			function soundcloud(song, artist) {
+				// var req = new XMLHttpRequest();
+				// if (!artist) {
+				// 	statusContainer.innerHTML = "<p id=\"status\">Searching for song " + song + "</p>";
+				// 	req.open('GET', 'https://api.spotify.com/v1/search?type=track&q=' + encodeURIComponent(song), true);
+				// } else {
+				// 	statusContainer.innerHTML = "<p id=\"status\">Searching for song " + song + " by " + artist + "</p>";
+				// 	req.open('GET', 'https://api.spotify.com/v1/search?type=track&q=' + encodeURIComponent(song + " " + artist), true);
+				// }
+				// req.onreadystatechange = function() {
+				// 	if (req.readyState == 4 && req.status == 200) {
+				// 		var data = JSON.parse(req.responseText);
+				// 		var firstResult = data.tracks.items[0];
+				// 		if (firstResult) {
+				// 			audio.setAttribute('src', firstResult.preview_url);
+				// 			statusContainer.innerHTML = "<p id=\"status\">Playing " + firstResult.name + " by " + firstResult.artists[0].name + "</p>";
+				// 			audio.play();
+				// 	  	} else {
+				// 	  		statusContainer.innerHTML = "<p> id=\"status\"Status: " + song + " not found</p>";
+				// 	  	}
+				//   	}
+				// };
+				// req.send(null);
+			}
+
+			function pauseSong() {
+				if (audio) {
+					audio.pause();
+					statusContainer.innerHTML = "<p id=\"status\">Paused song</p>";
+				}
+			}
+
+			function resumeSong() {
+				if (audio) {
+					audio.play();
+					statusContainer.innerHTML = "<p id=\"status\">Resumed song</p>";
+				}
 			}
 
 			// Add our commands to annyang
