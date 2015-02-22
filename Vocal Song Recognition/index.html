@@ -10,6 +10,7 @@
 		<script src="scripts/songSearch.js"></script>
 		<script src="scripts/annyang.min.js"></script>
 		<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+		<!--<script src="https://connect.soundcloud.com/sdk.js"></script>-->
 
 	</head>
 
@@ -21,14 +22,16 @@
 	        <div class="cover-container">
 	          <div class="inner cover">
 	            <h1 class="cover-heading">Welcome to Play It!</h1>
-	            <p class="lead">Play It takes either song names or lyrics and plays the song for you. Say "search Spotify for <song> by <artist>" to play a song. Say "stop playing" to pause the audio. Say "Find..." and then a set of lyrics to find the song with those lyrics and play it.
+	            <p class="lead">Play It takes either song names or lyrics and plays the song for you. Say "play <song>" or "play <song> by <artist>" to play a song via Spotify. Say "stop playing" to pause the audio and "resume playing" to resume the audio. Say "Find..." and then a set of lyrics to find the song with those lyrics and play it.
 	            </p>
 	          </div>
-	          <div id="status_container"></div>
+	          <div id="status_container">
+	          	<p id="status">Nothing playing.</p>
+	          </div>
 
 	          <div class="mastfoot">
 	            <div class="inner">
-	              <p>Tree Hacks 2015, (c) Tommy Fan, Debnil Sur, Gary Thung, Chenyao Yu. Powered by <a href="http://getbootstrap.com">Bootstrap</a>.</p>
+	              <p>TreeHacks 2015, &copy; Tommy Fan, Debnil Sur, Gary Thung, Chenyao Yu. Powered by <a href="http://getbootstrap.com">Bootstrap</a>.</p>
 	            </div>
 	          </div>
 
@@ -45,66 +48,67 @@
 		if (annyang) {
 			console.log("annyang initialized");
 
+			// SC.initialize({
+  	// 			client_id: '2a0608a423411b244a4488605d6e4e22'
+			// });
+
 			var statusContainer = document.getElementById("status_container");
 
 			var commands = {
-				'search spotify for *song (by *artist)': spotify,
-				'search soundcloud for *song (by *artist)': soundcloud,
+				'play *song (by *artist)': spotify,
+				// 'search soundcloud for *song': soundCloud,
 				'stop playing': pauseSong,
-				'resume song': resumeSong
+				'resume playing': resumeSong
 			};
 
 			var audio = document.createElement('audio');
 
+			audio.addEventListener('ended', function() {
+				statusContainer.innerHTML = "<p id=\"status\">Nothing playing.</p>";
+			}); 
+
 			function spotify(song, artist) {
 				var req = new XMLHttpRequest();
 				if (!artist) {
-					statusContainer.innerHTML = "<p id=\"status\">Searching for song " + song + " in Spotify</p>";
+					statusContainer.innerHTML = "<p id=\"status\">Searching for song \"" + song + "\" in Spotify</p>";
 					req.open('GET', 'https://api.spotify.com/v1/search?type=track&q=' + encodeURIComponent(song), true);
 				} else {
-					statusContainer.innerHTML = "<p id=\"status\">Searching for song " + song + " by " + artist + " in Spotify</p>";
+					statusContainer.innerHTML = "<p id=\"status\">Searching for song \"" + song + "\" by \"" + artist + "\" in Spotify</p>";
 					req.open('GET', 'https://api.spotify.com/v1/search?type=track&q=' + encodeURIComponent(song + " " + artist), true);
 				}
 				req.onreadystatechange = function() {
 					if (req.readyState == 4 && req.status == 200) {
 						var data = JSON.parse(req.responseText);
-						var firstResult = data.tracks.items[0];
-						if (firstResult) {
+						if (data.tracks.total != 0) {
+							var firstResult = data.tracks.items[0];
 							audio.setAttribute('src', firstResult.preview_url);
 							statusContainer.innerHTML = "<p id=\"status\">Playing " + firstResult.name + " by " + firstResult.artists[0].name + " from Spotify</p>";
 							audio.play();
-					  	} else {
-					  		statusContainer.innerHTML = "<p> id=\"status\"Status: " + song + " not found in Spotify</p>";
-					  	}
+						} else {
+							statusContainer.innerHTML = "<p id=\"status\">" + song + " not found in Spotify</p>";
+							return;
+						}
+				  	} else {
+				  		statusContainer.innerHTML = "<p id=\"status\">Request failed</p>";
 				  	}
 				};
 				req.send(null);
 			}
 
-			function soundcloud(song, artist) {
-				// var req = new XMLHttpRequest();
-				// if (!artist) {
-				// 	statusContainer.innerHTML = "<p id=\"status\">Searching for song " + song + "</p>";
-				// 	req.open('GET', 'https://api.spotify.com/v1/search?type=track&q=' + encodeURIComponent(song), true);
-				// } else {
-				// 	statusContainer.innerHTML = "<p id=\"status\">Searching for song " + song + " by " + artist + "</p>";
-				// 	req.open('GET', 'https://api.spotify.com/v1/search?type=track&q=' + encodeURIComponent(song + " " + artist), true);
-				// }
-				// req.onreadystatechange = function() {
-				// 	if (req.readyState == 4 && req.status == 200) {
-				// 		var data = JSON.parse(req.responseText);
-				// 		var firstResult = data.tracks.items[0];
-				// 		if (firstResult) {
-				// 			audio.setAttribute('src', firstResult.preview_url);
-				// 			statusContainer.innerHTML = "<p id=\"status\">Playing " + firstResult.name + " by " + firstResult.artists[0].name + "</p>";
-				// 			audio.play();
-				// 	  	} else {
-				// 	  		statusContainer.innerHTML = "<p> id=\"status\"Status: " + song + " not found</p>";
-				// 	  	}
-				//   	}
-				// };
-				// req.send(null);
-			}
+			// function soundCloud(song) {
+			// 	statusContainer.innerHTML = "<p id=\"status\">Searching for song " + song + " in SoundCloud</p>";
+			// 	SC.get('/tracks', { title: song , sharing: "public" }, function(tracks) {
+			// 		if (tracks) {
+			// 			var firstResult = tracks[0];
+			// 			console.log(tracks);
+			// 			audio.setAttribute('src', firstResult.stream_url + "?client_id=2a0608a423411b244a4488605d6e4e22");
+			// 			statusContainer.innerHTML = "<p id=\"status\">Playing " + firstResult.title + " by " + firstResult.user.username + " from SoundCloud</p>";
+			// 			audio.play();
+			// 		} else {
+			// 	  		statusContainer.innerHTML = "<p id=\"status\">Status: " + song + " not found in SoundCloud</p>";
+			// 	  	}
+			// 	});
+			// }
 
 			function pauseSong() {
 				if (audio) {
